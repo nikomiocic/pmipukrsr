@@ -1,1 +1,2 @@
 Informacije o projektu
+Dodana nova linija teksta u info.
