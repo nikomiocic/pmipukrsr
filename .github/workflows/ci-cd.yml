@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-jar:
+    name: Build Spring Boot JAR
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout koda
+      uses: actions/checkout@v4
+
+    - name: Postavi Java Environment
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Dozvola za pokretanje Maven Wrappera
+      run: chmod +x mvnw
+
+    - name: Izgradi paket s Mavenom
+      run: ./mvnw clean package -DskipTests
+
+    - name: Pohrani JAR kao Artifact
+      uses: actions/artifacts@v4
+      with:
+        name: spring-boot-jar
+        path: target/*.jar
+        retention-days: 1
